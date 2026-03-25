@@ -24,31 +24,29 @@ int validateInt(int value);
 float validateFloat(float value);
 
 int main() {
-    int choice;
+    struct Employee e = {101, "Clement", 25000, 5};
 
-    while (1) {
-        printf("\n===== Employee Payroll System =====\n");
-        printf("1. Add Employee\n");
-        printf("2. Display All Employees\n");
-        printf("3. Search Employee\n");
-        printf("4. Generate Payslip\n");
-        printf("5. Delete Employee\n");
-        printf("6. Exit\n");
-        printf("Enter choice: ");
-        fflush(stdout);
+    FILE *fp = fopen("employee.dat", "wb");
+    fwrite(&e, sizeof(e), 1, fp);
+    fclose(fp);
 
-        scanf("%d", &choice);
+    printf("===== Employee Payroll System =====\n");
 
-        switch (choice) {
-            case 1: addEmployee(); break;
-            case 2: displayAll(); break;
-            case 3: searchEmployee(); break;
-            case 4: generatePayslip(); break;
-            case 5: deleteEmployee(); break;
-            case 6: exit(0);
-            default: printf("Invalid choice!\n");
-        }
-    }
+    float gross = calculateGross(e.basicPay, e.otHours);
+    float tax = calculateTax(gross);
+    float net = gross - tax;
+
+    printf("\n===== PAYSLIP =====\n");
+    printf("EmpID: %d\n", e.empID);
+    printf("Name: %s\n", e.name);
+    printf("Basic Pay: %.2f\n", e.basicPay);
+    printf("OT Pay: %.2f\n", (float)e.otHours * OT_RATE);
+    printf("Gross Pay: %.2f\n", gross);
+    printf("Tax: %.2f\n", tax);
+    printf("Net Pay: %.2f\n", net);
+    printf("===================\n");
+
+    return 0;
 }
 
 // Validation
