@@ -35,6 +35,8 @@ int main() {
         printf("5. Delete Employee\n");
         printf("6. Exit\n");
         printf("Enter choice: ");
+        fflush(stdout);
+
         scanf("%d", &choice);
 
         switch (choice) {
@@ -49,7 +51,7 @@ int main() {
     }
 }
 
-// Input validation
+// Validation
 int validateInt(int value) {
     if (value < 0) {
         printf("Invalid input!\n");
@@ -77,17 +79,21 @@ void addEmployee() {
     }
 
     printf("Enter EmpID: ");
+    fflush(stdout);
     scanf("%d", &e.empID);
     if (!validateInt(e.empID)) return;
 
     printf("Enter Name: ");
+    fflush(stdout);
     scanf(" %[^\n]", e.name);
 
     printf("Enter Basic Pay: ");
+    fflush(stdout);
     scanf("%f", &e.basicPay);
     if (!validateFloat(e.basicPay)) return;
 
     printf("Enter OT Hours: ");
+    fflush(stdout);
     scanf("%d", &e.otHours);
     if (!validateInt(e.otHours)) return;
 
@@ -129,6 +135,7 @@ void searchEmployee() {
     }
 
     printf("Enter EmpID: ");
+    fflush(stdout);
     scanf("%d", &id);
 
     while (fread(&e, sizeof(e), 1, fp)) {
@@ -159,6 +166,7 @@ void deleteEmployee() {
     }
 
     printf("Enter EmpID to delete: ");
+    fflush(stdout);
     scanf("%d", &id);
 
     int found = 0;
@@ -183,7 +191,7 @@ void deleteEmployee() {
         printf("Employee not found!\n");
 }
 
-// Payroll calculations
+// Calculations
 float calculateGross(float basic, int ot) {
     return basic + (ot * OT_RATE);
 }
@@ -197,7 +205,7 @@ float calculateTax(float gross) {
         return gross * 0.2;
 }
 
-// Generate payslip
+// Payslip
 void generatePayslip() {
     int id, found = 0;
     struct Employee e;
@@ -209,6 +217,7 @@ void generatePayslip() {
     }
 
     printf("Enter EmpID: ");
+    fflush(stdout);
     scanf("%d", &id);
 
     while (fread(&e, sizeof(e), 1, fp)) {
