@@ -1,0 +1,160 @@
+/*
+Project Title: Employee Payroll System
+*/
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define FILE_NAME "employees.dat"
+#define OT_RATE 100
+
+struct Employee {
+    int empID;
+    char name[50];
+    float basicPay;
+    int otHours;
+};
+
+// Function prototypes
+void addEmployee();
+void displayAll();
+void generatePayslip();
+float calculateGross(float basic, int ot);
+float calculateTax(float gross);
+
+int main() {
+    int choice;
+
+    while (1) {
+        printf("\n===== EMPLOYEE PAYROLL SYSTEM =====\n");
+        printf("1. Add Employee\n");
+        printf("2. Display All Employees\n");
+        printf("3. Generate Payslip\n");
+        printf("4. Exit\n");
+        printf("Enter choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1: addEmployee(); break;
+            case 2: displayAll(); break;
+            case 3: generatePayslip(); break;
+            case 4: exit(0);
+            default: printf("Invalid choice!\n");
+        }
+    }
+}
+
+// Add employee
+void addEmployee() {
+    struct Employee emp;
+    FILE *fp = fopen(FILE_NAME, "ab");
+
+    if (fp == NULL) {
+        printf("Error opening file!\n");
+        return;
+    }
+
+    printf("\nEnter Employee ID: ");
+    scanf("%d", &emp.empID);
+
+    printf("Enter Name: ");
+    scanf(" %[^\n]", emp.name);
+
+    printf("Enter Basic Pay: ");
+    scanf("%f", &emp.basicPay);
+
+    if (emp.basicPay < 0) {
+        printf("Invalid Basic Pay!\n");
+        return;
+    }
+
+    printf("Enter OT Hours: ");
+    scanf("%d", &emp.otHours);
+
+    if (emp.otHours < 0) {
+        printf("Invalid OT Hours!\n");
+        return;
+    }
+
+    fwrite(&emp, sizeof(emp), 1, fp);
+    fclose(fp);
+
+    printf("Employee Added Successfully!\n");
+}
+
+// Display all employees
+void displayAll() {
+    struct Employee emp;
+    FILE *fp = fopen(FILE_NAME, "rb");
+
+    if (fp == NULL) {
+        printf("No records found!\n");
+        return;
+    }
+
+    printf("\n--- Employee Records ---\n");
+
+    while (fread(&emp, sizeof(emp), 1, fp)) {
+        printf("ID: %d | Name: %s | Basic: %.2f | OT: %d\n",
+               emp.empID, emp.name, emp.basicPay, emp.otHours);
+    }
+
+    fclose(fp);
+}
+
+// Generate payslip
+void generatePayslip() {
+    int id, found = 0;
+    struct Employee emp;
+
+    FILE *fp = fopen(FILE_NAME, "rb");
+
+    if (fp == NULL) {
+        printf("No records found!\n");
+        return;
+    }
+
+    printf("Enter Employee ID: ");
+    scanf("%d", &id);
+
+    while (fread(&emp, sizeof(emp), 1, fp)) {
+        if (emp.empID == id) {
+            found = 1;
+
+            float gross = calculateGross(emp.basicPay, emp.otHours);
+            float tax = calculateTax(gross);
+            float net = gross - tax;
+
+            printf("\n===== PAYSLIP =====\n");
+            printf("Employee ID: %d\n", emp.empID);
+            printf("Name: %s\n", emp.name);
+            printf("Basic Pay: %.2f\n", emp.basicPay);
+            printf("OT Pay: %.2f\n", emp.otHours * OT_RATE);
+            printf("Gross Pay: %.2f\n", gross);
+            printf("Tax: %.2f\n", tax);
+            printf("Net Pay: %.2f\n", net);
+        }
+    }
+
+    if (!found) {
+        printf("Employee not found!\n");
+    }
+
+    fclose(fp);
+}
+
+// Calculate gross pay
+float calculateGross(float basic, int ot) {
+    return basic + (ot * OT_RATE);
+}
+
+// Calculate tax
+float calculateTax(float gross) {
+    if (gross < 20000)
+        return gross * 0.05;
+    else if (gross <= 50000)
+        return gross * 0.10;
+    else
+        return gross * 0.20;
+}
